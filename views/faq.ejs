@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQs - Car Wash App</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f8ff;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .header {
+            background-color: #004aad;
+            color: white;
+            padding: 15px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .faq-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .faq-item {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        .faq-question {
+            background: #004aad;
+            color: white;
+            padding: 15px;
+            cursor: pointer;
+            text-align: left;
+            border-radius: 5px;
+        }
+        .faq-answer {
+            display: none;
+            padding: 15px;
+            text-align: left;
+            background: #e8f0ff;
+            border-radius: 5px;
+        }
+        .footer {
+            margin-top: 20px;
+            background-color: #004aad;
+            color: white;
+            padding: 10px;
+            font-size: 14px;
+            display: flex;
+            justify-content: end;
+            place-content: end;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">Car Wash App - FAQs</div>
+
+    <div class="faq-container">
+        <% let faqs = [
+            { question: "How do I book a car wash?", answer: "You can book a car wash through our app by selecting a service, choosing a washer, and confirming the booking." },
+            { question: "What payment methods are accepted?", answer: "We accept credit/debit cards, UPI, and digital wallets for secure payments." },
+            { question: "Can I cancel a booking?", answer: "Yes, you can cancel a booking up to 30 minutes before the scheduled wash. A cancellation fee may apply." },
+            { question: "How do I become a washer on the platform?", answer: "You can register as a washer in the app by providing your details, service area, and verification documents." },
+            { question: "What if my car is damaged during a wash?", answer: "We ensure trained professionals handle your car. In case of any damage, please report it through the app for resolution." },
+            { question: "Is there a subscription plan for regular washes?", answer: "Yes, we offer monthly and yearly subscription plans for discounted washes." },
+            { question: "Do washers bring their own cleaning supplies?", answer: "Yes, our washers bring high-quality cleaning products and equipment for each wash." }
+        ]; %>
+
+        <% faqs.forEach((faq, index) => { %>
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleAnswer('<%= index %>')">
+                    <%= faq.question %>
+                </div>
+                <div class="faq-answer" id="answer-<%= index %>">
+                    <%= faq.answer %>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+
+    <div class="footer">© <%= new Date().getFullYear() %> Car Wash App. All rights reserved.</div>
+
+    <script>
+        function toggleAnswer(index) {
+            let answer = document.getElementById("answer-" + index);
+            answer.style.display = (answer.style.display === "block") ? "none" : "block";
+        }
+    </script>
+
+</body>
+</html>
