@@ -44,6 +44,11 @@ app.get("/pay", (req, res) => {
 })
 
 
+app.get("/privacy-policy", (req, res) => {
+    res.render("privacy-policy");
+})
+
+
 app.get('/faq', (req, res) => {
     const faqs = [
         { question: "How do I book a car wash?", answer: "You can book a car wash through our app by selecting a service, choosing a washer, and confirming the booking." },
