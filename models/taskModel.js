@@ -6,6 +6,7 @@ const taskSchema = new mongoose.Schema({
         day: { type: String, required: true },
         slot: { type: String, default: null },
         occurrence: { type: String, default: null },
+        vehicle:{type:String, required:true}
     },
     ownerId: {
         type: mongoose.Schema.Types.ObjectId,

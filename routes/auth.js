@@ -6,6 +6,7 @@ const User = require('../models/userModel');
 const WashForm = require("../models/taskModel");
 const taskModel = require('../models/taskModel');
 // const nodemailer = require("nodemailer");
+const authMiddleware = require("../middleware/auth")
 
 const router = express.Router();
 
@@ -39,7 +40,7 @@ router.post('/signup', async (req, res) => {
     await user.save();
 
     // Generate JWT token
-    const token = jwt.sign({ email, role }, SECRET_KEY, { expiresIn: '5h' });
+    const token = jwt.sign({ email, role }, process.env.JWT_SECRET, { expiresIn: '5h' });
 
     res.status(201).json({
       success: true,
@@ -81,14 +82,10 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.get('/profile', async (req, res) => {
+router.get('/profile', authMiddleware, async (req, res) => {
+  const { email } = req.user;
   try {
-    console.log(req.body);
-    
-    const user = req.user.email;
-    console.log(user);
-
-    const userData = await User.findOne({ email: req.user.email }).select('-password');;
+    const userData = await User.findOne({ email: email }).select('-password -_id');;
     console.log(userData);
 
     res.status(200).json(userData);
@@ -177,16 +174,22 @@ router.get("/getowner", async (req, res) => {
   }
 });
 
-router.post("/get-info-owner", async (req, res) => {
+router.get("/get-info-owner", authMiddleware, async (req, res) => {
+  const { email } = req.user;
   try {
-    const user = req.user;
-    const ifuser = await User.findOne({ email: user.email });
-    ifuser ? res.status(200).message({ success: true, data: ifuser.personaldetails }) : res.status(404).message({ success: false, data: "User not found " })
+    const ifuser = await User.findOne({ email });
+
+    if (ifuser) {
+      return res.status(200).json({ success: true, data: ifuser });
+    } else {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
   } catch (err) {
     console.error(err);
-    res.status(500).send({ success: false, message: "Internal Server Error" });
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
-})
+});
+
 
 router.post("/update-task", (req, res) => {
   try {
@@ -210,9 +213,9 @@ router.get("/get-washer", async (req, res) => {
 
 
 router.post("/user/post-task", async (req, res) => {
+  const { formData, washerId, ownerId } = req.body;
+  console.log(formData, washerId, ownerId);
   try {
-    const { formData, washerId, ownerId } = req.body;
-    console.log(formData, washerId, ownerId);
 
 
     if (!formData || !washerId || !ownerId) {
@@ -234,31 +237,24 @@ router.post("/user/post-task", async (req, res) => {
 })
 
 
-router.get("/user/get-tasks", async (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1];
+router.get("/user/get-tasks", authMiddleware, async (req, res) => {
+  const { email } = req.user;
+
   try {
-    console.log(token);
+    const user = await User.findOne({ email: email });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    const tokendecoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(tokendecoded);
-
-
-    const user = await User.findOne({ email: tokendecoded.email }).select(" -password ");
-
-    const getTask = await taskModel.find({ ownerId: user._id }).select("-createdAt -updatedAt -washerId -ownerId -_id ");
-    const getUser = await User.findOne({ _id: getTask.washerId });
-
-    console.log("this is 1", user, "this is 2", getTask, "this is 3", tasksWithDriverDetails);
-
-    const driverinfo = { username: getUser.username, rating: getUser.overallRating };
-    console.log(info, driverinfo);
+    const tasks = await taskModel.find({ ownerId: user._id }).select(" -updatedAt -ownerId -_id");
+    console.log(tasks);
 
 
-    return res.status(200).json({ message: "User data got fetched successfully", info: user, driverinfo });
+    return res.status(200).json({ message: "User tasks fetched successfully", tasks });
   } catch (err) {
-    console.log(err.message);
+    console.error(err.message);
+    return res.status(500).json({ message: "Internal server error" });
   }
-})
+});
+
 
 
 router.post('/validate', (req, res) => {

@@ -8,6 +8,7 @@ const connectDB = require("./config/dbconn");
 const Task = require("./models/taskModel");
 const http = require("http");
 const path = require("path");
+const vehicleroute = require("./routes/vehicleRoute");
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -22,6 +23,8 @@ app.use(express.static(path.join(__dirname, "public")));
 connectDB();
 
 app.use('/api', routes);
+app.use('/api/vehicle', vehicleroute);
+
 
 app.get("/", (req, res) => {
     res.render("index", { title: "CarCare" });
@@ -29,6 +32,17 @@ app.get("/", (req, res) => {
 app.get("/rating", (req, res) => {
     res.render("rating");
 })
+
+
+app.get("/pay", (req, res) => {
+    const { amount, name, email, phone } = req.query;
+    if (!amount || !name || !email || !phone) {
+        console.error("Amount or user information is missing.");
+        return;
+    }
+    res.render("payment", { amount: amount || 0, name: name || "JOhn Doe", email: email || "abc@example.com", phone: phone || "+91 9999999999", razorpayKey: process.env.razorpay_key });
+})
+
 
 app.get('/faq', (req, res) => {
     const faqs = [

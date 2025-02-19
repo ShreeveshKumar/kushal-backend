@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 
 const authMiddleware = (req, res, next) => {
-  console.log("hit");
   const token = req.header('Authorization')?.split(' ')[1];
 
   if (!token) {

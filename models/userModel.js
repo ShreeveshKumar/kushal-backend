@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['owner', 'washer'], required: true },
-  phone: { type: Number, unique: true  },
+  phone: { type: Number, unique: true },
   address: {
     type: String,
   },
@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema({
     comment: { type: String },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     createdAt: { type: Date },
+    status: { type: Boolean, default: true },
   },
 
   ownerDetails: {
@@ -30,7 +31,12 @@ const userSchema = new mongoose.Schema({
       createdAt: { type: Date },
     },
   },
-
+  coupons: {
+    minisuv: { type: Number, default: 0 },
+    suv: { type: Number, default: 0 },
+    hatchback: { type: Number, default: 0 },
+    sedan: { type: Number, default: 0 },
+  }
 
 });
 

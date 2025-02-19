@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make Payment</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Make Payment</h1>
+        <button onclick="makePayment()">Pay Now</button>
+    </div>
+
+    <script>
+        var amount = "<%= amount %>";
+        var userName = "<%- name %>";
+        var userEmail = "<%- email %>";
+        var userPhone = "<%- phone %>";
+
+
+        function makePayment() {
+            console.log("Amount:", amount, userName, userEmail, userPhone);
+
+            if (!amount || !userName || !userEmail || !userPhone) {
+                console.error("Amount or userInfo is missing.");
+                return; // Prevent payment initiation
+            }
+
+            var options = {
+                key: "<%= razorpayKey %>",
+                amount: amount * 100, // Convert to paise
+                currency: "INR",
+                name: "Carcare",
+                description: "Payment for Order #12345",
+                image: 'https://imgd.aeplcdn.com/0x0/ec/C5/A7/11148/img/l/Logo-19772.jpg?q=75',
+                handler: function (response) {
+                    alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
+                },
+                prefill: {
+                    name: userName,
+                    email: userEmail,
+                    contact: userPhone
+                },
+                theme: {
+                    color: "#007bff"
+                }
+            };
+
+            try {
+                var rzp = new Razorpay(options);
+                rzp.open();
+            } catch (error) {
+                console.error('Error initializing Razorpay:', error);
+            }
+        }
+
+
+
+    </script>
+</body>
+
+</html>
