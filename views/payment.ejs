@@ -44,9 +44,26 @@
 
     <script>
         var amount = "<%= amount %>";
+        var type = "<%= type %>";
         var userName = "<%- name %>";
         var userEmail = "<%- email %>";
         var userPhone = "<%- phone %>";
+
+
+
+        async function handlePayment(response, userEmail) {
+            const res = await fetch(`https://kushal-backend.onrender.com/api/product/pay/verify`, {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json",
+                },
+                body: JSON.stringify({ paymentid: response.razorpay_payment_id, userEmail, type })
+            });
+
+            const result = await res.json();
+            console.log(result);
+        }
+
 
 
         function makePayment() {
@@ -65,12 +82,13 @@
                 description: "Payment for Order #12345",
                 image: 'https://imgd.aeplcdn.com/0x0/ec/C5/A7/11148/img/l/Logo-19772.jpg?q=75',
                 handler: function (response) {
+                    handlePayment(response, userEmail);
                     alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
                 },
                 prefill: {
                     name: userName,
                     email: userEmail,
-                    contact: userPhone
+                    contact: userPhone,
                 },
                 theme: {
                     color: "#007bff"

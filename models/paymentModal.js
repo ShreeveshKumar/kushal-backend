@@ -5,12 +5,8 @@ const paymentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, ref: "User",
         required: true,
     },
-    washerId: {
-        type: mongoose.Schema.Types.ObjectId, ref: "User",
-        required: true,
-    },
     paymentId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         required: true,
     },
     category: {
@@ -22,10 +18,17 @@ const paymentSchema = new mongoose.Schema({
         required: true,
     },
     status: {
-        type: Boolean,
-        default: true,
-        required: true,
+        type: String,
+        default: "pending",
+    },
+    couponCode: {
+        type: String,
+        unique: true
+    },
+    verified: {
+        type: String,
+        required: true
     }
-})
+});
 
 module.exports = mongoose.model("payments", paymentSchema);
