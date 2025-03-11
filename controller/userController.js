@@ -90,3 +90,16 @@ exports.getvouchers = async (req, res) => {
     }
 }
 
+
+
+exports.userprofile = async (req, res) => {
+    const { email } = req.user;
+    try {
+        const userData = await userModal.findOne({ email: email }).select('-password -_id');;
+        console.log(userData);
+
+        res.status(200).json(userData);
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+}

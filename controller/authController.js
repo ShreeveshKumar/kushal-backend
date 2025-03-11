@@ -1,4 +1,4 @@
-const { default: sendMail } = require("../config/mailconfig");
+const sendMail = require("../config/mailconfig");
 const userModel = require("../models/userModel");
 const otpModel = require("../models/forgotPasswordModel");
 
@@ -79,7 +79,7 @@ exports.verifyOtp = async (req, res) => {
     }
 };
 
-module.exports = async (req, res) => {
+exports.login = async (req, res) => {
     const { email, password, role } = req.body;
     console.log(email, password, role);
 
@@ -89,7 +89,7 @@ module.exports = async (req, res) => {
     }
 
     try {
-        const user = await User.findOne({ email });
+        const user = await userModel.findOne({ email });
         if (!user) {
             return res.status(400).json({ error: 'Invalid credentials' });
         }
@@ -117,17 +117,16 @@ exports.signup = async (req, res) => {
     }
 
     try {
-        const existingUser = await User.findOne({ email });
+        const existingUser = await userModel.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ error: 'User already exists' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = new User({ username, email, password: hashedPassword, role });
+        const user = new userModel({ username, email, password: hashedPassword, role });
         await user.save();
 
-        // Generate JWT token
         const token = jwt.sign({ email, role }, process.env.JWT_SECRET, { expiresIn: '5h' });
 
         res.status(201).json({

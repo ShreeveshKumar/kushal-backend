@@ -29,4 +29,4 @@ const sendMail = async ({ subject, message, user }) => {
 
 
 
-export default sendMail; 
+module.exports = sendMail; 
