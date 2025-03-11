@@ -4,10 +4,15 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['owner', 'washer'], required: true },
+  role: { type: String, enum: ['owner', 'washer', 'admin'], required: true },
   phone: { type: Number, unique: true },
   address: {
     type: String,
+  },
+  accounttype: {
+    type: String,
+    required: true,
+    default: 'active'
   },
 
   createdAt: { type: Date, default: Date.now },

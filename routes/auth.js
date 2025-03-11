@@ -21,66 +21,8 @@ const router = express.Router();
 // });
 
 
-router.post('/signup', async (req, res) => {
-  const { username, email, password, role } = req.body;
-
-  if (!username || !email || !password || !role) {
-    return res.status(400).json({ error: 'All fields are required' });
-  }
-
-  try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = new User({ username, email, password: hashedPassword, role });
-    await user.save();
-
-    // Generate JWT token
-    const token = jwt.sign({ email, role }, process.env.JWT_SECRET, { expiresIn: '5h' });
-
-    res.status(201).json({
-      success: true,
-      message: 'User registered successfully',
-      token
-    });
-  } catch (error) {
-    console.error("Signup Error:", error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-router.post('/login', async (req, res) => {
-  const { email, password, role } = req.body;
-  console.log(email, password, role);
 
 
-  if (!email || !password || !role) {
-    return res.status(400).json({ error: 'Email and password are required' });
-  }
-
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ error: 'Invalid credentials' });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res.status(400).json({ error: 'Invalid credentials' });
-    }
-
-    const token = jwt.sign({ email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '5h' });
-
-    res.status(200).json({ success: true, message: 'Login successful', user: { token, email, role } });
-  } catch (error) {
-    res.status(500).json({ success: false, error: 'Server error' });
-  }
-});
 
 router.get('/profile', authMiddleware, async (req, res) => {
   const { email } = req.user;
@@ -111,17 +53,6 @@ router.post("/forgot-password", async (req, res) => {
 
 })
 
-router.post("/validate", async (req, res) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  console.log(token);
-
-  const tokendecoded = jwt.verify(token, process.env.JWT_SECRET);
-  console.log(tokendecoded);
-
-  tokendecoded ? res.status(200).json({ valid: true, loggedin: true }) : res.status(433).json({ valid: false, loggedin: false });
-
-
-})
 
 router.post("/scheduletask", async (req, res) => {
   try {
@@ -191,14 +122,6 @@ router.get("/get-info-owner", authMiddleware, async (req, res) => {
 });
 
 
-router.post("/update-task", (req, res) => {
-  try {
-
-  } catch (err) {
-    console.log(err);
-  }
-})
-
 
 router.get("/get-washer", async (req, res) => {
   try {
@@ -256,27 +179,6 @@ router.get("/user/get-tasks", authMiddleware, async (req, res) => {
 });
 
 
-
-router.post('/validate', (req, res) => {
-  const { token } = req.body;
-
-  if (!token) {
-    return res.status(400).json({ message: 'Token is required' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, SECRET_KEY);
-
-    const user = users.find(user => user.id === decoded.id);
-    if (user) {
-      return res.status(200).json({ isLoggedIn: true });
-    } else {
-      return res.status(401).json({ isLoggedIn: false });
-    }
-  } catch (error) {
-    return res.status(401).json({ message: 'Invalid or expired token' });
-  }
-});
 
 
 module.exports = router;

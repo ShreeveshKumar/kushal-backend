@@ -11,9 +11,12 @@ const path = require("path");
 const rateLimit = require("express-rate-limit");
 const vehicleroute = require("./routes/vehicleRoute");
 const paymentroute = require("./routes/paymentRoute");
+const authRoute = require("./routes/auth")
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const { Server } = require("socket.io");
+const cron = require("node-cron");
+const { scheduledeletion } = require("./controller/userController")
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -36,14 +39,13 @@ io.on("connection", (socket) => {
 
     socket.on("message", (data) => {
         console.log(`Received message: ${data}`);
-        io.emit("message", data); 
+        io.emit("message", data);
     });
 
     socket.on("disconnect", () => {
         console.log(`User disconnected: ${socket.id}`);
     });
 });
-
 
 const options = {
     definition: {
@@ -76,6 +78,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // app.use('/api', routes);
+app.use("/api", authRoute);
 app.use('/api/vehicle', vehicleroute);
 app.use('/api/product', paymentroute);
 
@@ -132,6 +135,12 @@ app.get('/faq', (req, res) => {
     ];
 
     res.render('faq', { faqs });
+});
+
+
+
+cron.schedule("0 0 * * *", async () => {
+    await scheduledeletion();
 });
 
 server.listen(PORT, () => {

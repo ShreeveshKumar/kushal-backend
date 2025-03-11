@@ -52,7 +52,7 @@
 
 
         async function handlePayment(response, userEmail) {
-            const res = await fetch(`https://kushal-backend.onrender.com/api/product/pay/verify`, {
+            const res = await fetch(`http://172.17.0.1:8000/api/product/pay/verify`, {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json",

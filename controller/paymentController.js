@@ -65,3 +65,28 @@ exports.createCoupon = async (req, res) => {
         return res.status(500).json({ message: "Error occurred", error });
     }
 };
+
+
+
+exports.seeHistory = async (req, res) => {
+    const { email } = req.user;
+    try {
+        if (!email) {
+            return res.status(404).json({ message: "No user found" });
+        }
+
+        const isuser = await userModal.findOne({ email });
+
+        if (!isuser) {
+            return res.status(404).json({ message: "No user found" });
+        }
+
+        const paymenthist = await paymentModal.find({ ownerId: isuser._id }).sort({ createdAt: -1 });
+
+        return res.status(200).json({ message: "payment details fetched successfyully", paymenthist });
+    } catch (err) {
+        return res.status(500).json({ message: "an Error occured", err })
+    }
+}
+
+
