@@ -12,6 +12,7 @@ const { Server } = require("socket.io");
 const cron = require("node-cron");
 const connectDB = require("./config/dbconn");
 const { scheduledeletion } = require("./controller/userController");
+const { Queue, Worker } = require('bullmq');
 
 const authRoute = require("./routes/authRoute");
 const userRoute = require("./routes/userRoute");
@@ -33,6 +34,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 connectDB();
+const connection = { url: process.env.REDIS_URL };
 
 const limiter = rateLimit({
     windowMs: 10 * 1000,
@@ -53,6 +55,7 @@ io.on("connection", (socket) => {
         console.log(`User disconnected: ${socket.id}`);
     });
 });
+
 
 const swaggerOptions = {
     definition: {

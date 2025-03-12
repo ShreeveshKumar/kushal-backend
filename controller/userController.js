@@ -1,6 +1,7 @@
 const userModal = require("../models/userModel");
 const deleteModal = require("../models/deleteModel");
 const userModel = require("../models/userModel");
+const emailQueue = require("./scheduleController");
 
 
 exports.deleteaccount = async (req, res) => {
@@ -23,6 +24,8 @@ exports.deleteaccount = async (req, res) => {
         const deluser = new deleteModal({ data: isuser.toObject(), date: deletionDate });
         await deluser.save();
 
+        await emailQueue("senddeleteMail", { email });
+
         return res.status(200).json({ message: "User deleted successfully" });
     } catch (err) {
         return res.status(500).json({ message: "Some error occured", err });
@@ -41,6 +44,8 @@ exports.deactivateaccount = async (req, res) => {
         }
 
         isuser.accounttype = 'inactive';
+
+        await emailQueue.add('sendinactiveMail', { email });
         await isuser.save();
         return res.status(200).json({ message: "User Deactivated successfully" });
     } catch (err) {
@@ -61,6 +66,7 @@ exports.scheduledeletion = async (req, res) => {
         }
 
         const allusers = alldeletions.map((user) => user.data._id);
+
 
         await userModal.deleteMany({ _id: allusers });
 
