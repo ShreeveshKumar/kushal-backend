@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const taskController = require("../controllers/taskController");
+const taskController = require("../controller/taskController");
 const authMiddleware = require("../middleware/auth");
 
 router.post("/schedule-task", authMiddleware, taskController.scheduleTask);

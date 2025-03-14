@@ -20,6 +20,7 @@ const vehicleRoute = require("./routes/vehicleRoute");
 const paymentRoute = require("./routes/paymentRoute");
 const feedbackRoute = require("./routes/feedbackRoute");
 const ratingRoute = require("./routes/feedbackRoute");
+const taskRoute = require("./routes/taskRoute");
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -78,6 +79,8 @@ app.use("/api/v1/ratings", ratingRoute);
 app.use("/api/v1/vehicle", vehicleRoute);
 app.use("/api/v1/payment", paymentRoute);
 app.use("/api/v1/feedback", feedbackRoute);
+app.use("/api/v1/task", taskRoute);
+
 
 app.get("/", (req, res) => res.render("index", { title: "CarCare" }));
 app.get("/privacy-policy", (req, res) => res.render("privacy-policy"));

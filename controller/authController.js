@@ -1,6 +1,8 @@
 const sendMail = require("../config/mailconfig");
 const userModel = require("../models/userModel");
 const otpModel = require("../models/forgotPasswordModel");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 exports.forgotpassword = async (req, res) => {
     const { email } = req.body;
@@ -90,6 +92,7 @@ exports.login = async (req, res) => {
 
     try {
         const user = await userModel.findOne({ email });
+
         if (!user) {
             return res.status(400).json({ error: 'Invalid credentials' });
         }
@@ -100,7 +103,13 @@ exports.login = async (req, res) => {
             return res.status(400).json({ error: 'Invalid credentials' });
         }
 
+        console.log(isMatch);
+
+
         const token = jwt.sign({ email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '5h' });
+
+        console.log(token);
+
 
         res.status(200).json({ success: true, message: 'Login successful', user: { token, email, role } });
     } catch (error) {
@@ -140,3 +149,23 @@ exports.signup = async (req, res) => {
     }
 };
 
+exports.validateUser = async (req, res) => {
+    try {
+        const token = req.header('Authorization')?.split(' ')[1];
+
+        if (!token) {
+            return res.status(401).json({ success: false, error: 'No token, authorization denied' });
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        const user = await userModel.findOne({ email: decoded.email });
+
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'User not found' });
+        }
+        return res.status(200).json({ success: true, user });
+
+    } catch (err) {
+        return res.status(401).json({ success: false, error: 'Invalid or expired token' });
+    }
+};

@@ -2,30 +2,59 @@ const vehicleModal = require("../models/vehicleModal");
 
 
 exports.addvehicle = async (req, res) => {
-    const { name, licenseNumber, description, lastServiced } = req.body;
+    const {
+        name,
+        licenseNumber,
+        make,
+        model,
+        year,
+        color,
+        type,
+        lastServiced,
+        servicePackage,
+        mileage,
+        fuelType,
+        fromState,
+        description
+    } = req.body;
+
     const { email } = req.user;
     console.log(req.body, email);
 
-
     try {
-        if (!name || !licenseNumber || !description || !lastServiced) {
+        if (!name || !licenseNumber || !make || !model || !year || !color || !type || !lastServiced || !mileage || !fuelType || !fromState || !description) {
             return res.status(400).json({ message: "Not all fields are added" });
         }
 
-        const isvehicle = await vehicleModal.findOne({ vehiclename: name });
+        const isvehicle = await vehicleModal.findOne({ licenseNumber });
 
         if (isvehicle) {
-            return res.status(400).json({ message: "Car with that name exists already" })
+            return res.status(400).json({ message: "Vehicle with that license number already exists" });
         }
 
-        const newvehicle = new vehicleModal({ user: email, vehiclename: name, license: licenseNumber, description: description, lastserviced: lastServiced });
+        const newvehicle = new vehicleModal({
+            name,
+            licenseNumber,
+            make,
+            model,
+            year,
+            color,
+            type,
+            lastServiced,
+            servicePackage,
+            mileage,
+            fuelType,
+            fromState,
+            description
+        });
+
         await newvehicle.save();
 
         return res.status(200).json({ message: "Vehicle added successfully" });
     } catch (err) {
-        return res.status(500).json({ message: "Vehicle is not added ", err })
+        return res.status(500).json({ message: "Vehicle is not added", err });
     }
-}
+};
 
 
 exports.viewvehicle = async (req, res) => {
